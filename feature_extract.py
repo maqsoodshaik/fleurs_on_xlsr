@@ -5,11 +5,12 @@ import shutil
 import os
 from transformers import AutoFeatureExtractor, Wav2Vec2ForPreTraining
 from transformers.models.wav2vec2.modeling_wav2vec2 import _compute_mask_indices
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 from datasets import load_dataset,concatenate_datasets
 feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/wav2vec2-large-xlsr-53")
-model = Wav2Vec2ForPreTraining.from_pretrained("facebook/wav2vec2-large-xlsr-53").to("cuda")
+model = Wav2Vec2ForPreTraining.from_pretrained("facebook/wav2vec2-large-xlsr-53").to(device)
 configs = get_dataset_config_names("google/fleurs")
-configs = ['ca_es','hr_hr','da_dk','nl_nl','en_us','fi_fi','fr_fr','de_de','el_gr','hu_hu','ga_ie','it_it','es_419','mt_mt','pt_br','sv_se','cy_gb']
+configs = ['as_in','bn_in','hi_in','or_in','pa_in','ta_in','te_in']
 print(configs)
 for name in configs:
   # ds_train = load_dataset("google/fleurs", name,split="train")
@@ -29,10 +30,13 @@ for name in configs:
     # mask_time_indices = _compute_mask_indices((batch_size, sequence_length), mask_prob=0.2, mask_length=2)
     # mask_time_indices = torch.tensor(mask_time_indices, device=input_values.device, dtype=torch.long)
     with torch.no_grad():
-      outputs = model(input_values.to("cuda"))#, mask_time_indices=mask_time_indices)
-    sequence_length = outputs.projected_quantized_states.shape[1]
-    proj = torch.cat((proj,outputs.projected_quantized_states.to("cpu")),dim = 1)
+      codevector_probs,codevectors = model(input_values.to(device))#, mask_time_indices=mask_time_indices)
+    proj = torch.cat((proj,codevector_probs.to("cpu")),dim = 0)
+  tot = proj.shape[0]
+  proj = proj.sum(dim = 0)
   proj = proj.squeeze()
+  proj = proj/tot
+  # proj = proj.unsqueeze(-1)*codevectors
   torch.save(proj, f'{name}.pt')
     
   # counter = {}

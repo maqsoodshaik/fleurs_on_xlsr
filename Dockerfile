@@ -20,4 +20,5 @@ ENV HF_HOME="./tmp"
 RUN apt-get update -y && apt-get install -y --no-install-recommends build-essential gcc \
                                       libsndfile1 
 ENV NUMBA_CACHE_DIR="./tmp"
+COPY modeling_wav2vec2.py /opt/conda/lib/python3.7/site-packages/transformers/models/wav2vec2
 CMD ["/bin/bash"]
