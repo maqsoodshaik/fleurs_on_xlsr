@@ -1,18 +1,23 @@
 import torchaudio
 from transformers import AutoFeatureExtractor, Wav2Vec2ForPreTraining
 import torch
-feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/wav2vec2-large-xlsr-53")
+
+feature_extractor = AutoFeatureExtractor.from_pretrained(
+    "facebook/wav2vec2-large-xlsr-53"
+)
 model = Wav2Vec2ForPreTraining.from_pretrained("facebook/wav2vec2-large-xlsr-53")
-wav,sample = torchaudio.load('/Users/mohammedmaqsoodshaik/Downloads/sa1.wav')
+wav, sample = torchaudio.load("/Users/mohammedmaqsoodshaik/Downloads/sa1.wav")
 print(wav.shape)
 print(sample)
-input_values = feature_extractor(wav.squeeze(), return_tensors="pt",sampling_rate = 16000).input_values
+input_values = feature_extractor(
+    wav.squeeze(), return_tensors="pt", sampling_rate=16000
+).input_values
 with torch.no_grad():
-    codevector_probs,codevectors,codevector_idx = model(input_values)
-print(codevector_idx.view(-1,2)[:,0])
-print(codevector_idx.view(-1,2)[:,1])
-#uk_assent(welcome)
-#male(jack)
+    codevector_probs, codevectors, codevector_idx = model(input_values)
+print(codevector_idx.view(-1, 2)[:, 0])
+print(codevector_idx.view(-1, 2)[:, 1])
+# uk_assent(welcome)
+# male(jack)
 # tensor([257, 257, 257, 257, 257, 257, 257, 279,  85,  85, 231, 280, 136, 136,
 #         136, 136, 280, 280, 280, 280, 280,  51, 129, 209,   6, 257,  31, 279,
 #         257,  46,  46, 134,  79, 148,  15, 148,  15,  15, 273, 273, 273, 273,
@@ -21,7 +26,7 @@ print(codevector_idx.view(-1,2)[:,1])
 #          33,  33, 229, 297, 229, 188, 202, 236, 186, 186, 110,  78, 226, 124,
 #         124, 209,  64,  64, 103, 174, 138, 120, 120, 120, 120, 216, 216, 302,
 #         302, 302, 302, 110, 172, 172, 172, 172])
-#female(maria)
+# female(maria)
 # tensor([257, 257, 257, 257, 257, 257, 279, 279,  85,  85, 188, 119, 119, 119,
 #         119, 119, 119, 119, 119, 119, 119, 188, 146,  70,   6,   6, 209,  20,
 #         134, 134,  46,  46,  79, 123,  95, 118,  95,  95, 245, 245,  53,  17,
@@ -63,8 +68,7 @@ print(codevector_idx.view(-1,2)[:,1])
 #         117, 117, 117, 117, 117, 117, 110, 289, 172, 172, 172])
 
 
-
-#timit(sa1.wav)
+# timit(sa1.wav)
 # tensor([257, 257, 257, 257, 257, 257,  31, 160,  31,  31,  31,  31,  46,  46,
 #          46,  46,  46, 134, 134, 134, 134, 257,  28,  28, 160, 209, 209,  31,
 #         160,  31,  66,  33,  33,  33,  33,  95,  95, 136, 136, 245,  12,  12,
