@@ -85,17 +85,3 @@ with open('saved_dictionary_codebook_1.pkl', 'wb') as f:
     pickle.dump(phn_dict, f)
 for dict_val in phn_dict.keys():
     print(f'{dict_val}-{dict(Counter(phn_dict[dict_val]))}')
-with open("saved_dictionary_codebook_1.pkl", "rb") as f:
-    phn_dict = pickle.load(f)
-import operator
-from collections import OrderedDict
-
-for dict_val in phn_dict.keys():
-    dict1 = dict(Counter(phn_dict[dict_val]))
-    sorted_tuples = sorted(dict1.items(), key=operator.itemgetter(1))
-    # print(sorted_tuples)  # [(1, 1), (3, 4), (2, 9)]
-
-    sorted_dict = OrderedDict()
-    for k, v in sorted_tuples:
-        sorted_dict[k] = v
-    print(f"{dict_val}-{dict(sorted_dict).popitem()[0]}")
