@@ -19,14 +19,10 @@ def adding_missing_phn_count(set_of_val,phn_dict,phn_name):
     #     sorted_dict[k] = v
     temp_lst = []
     #creating list of counts of code entries even including the codeentries which are not present
-    for val in set_of_val:
-        if val in phn_map_counts:
-            temp_lst.append(phn_map_counts[val])
-        else:
-            temp_lst.append(0)
+    temp_lst = [phn_map_counts[val] if val in phn_map_counts else 0 for val in set_of_val]
     temp_lst = [float(i)/sum(temp_lst) for i in temp_lst]
     return temp_lst
-if __name__ == "__main__":
+def main():
     with open("saved_dictionary_codebook_1.pkl", "rb") as f:
         phn_dict = pickle.load(f)
 
@@ -35,7 +31,7 @@ if __name__ == "__main__":
     set_of_val = set(list(flatten(phn_dict.values())))
     entropy_lst = []
 
-    for phn_name in phn_dict.keys():
+    for phn_name in phn_dict:
         temp_lst = adding_missing_phn_count(set_of_val,phn_dict,phn_name)
         
         #entropy calculation
@@ -43,12 +39,15 @@ if __name__ == "__main__":
         entropy_lst.append(entropy(temp_lst))
         # print(f"{dict_val}-{dict(sorted_dict).popitem()[0]}")
     #plotting the entropy
-    phn_dict_sorted_based_on_entropy = [x for _,x in sorted(zip(entropy_lst,list(phn_dict.keys())))]#sorting phonemes dictionary based on the corresponding entropy
-    g = sns.barplot(phn_dict_sorted_based_on_entropy, sorted(entropy_lst))
+    phn_dict_sorted_based_on_entropy = [x for _,x in sorted(zip(entropy_lst,list(phn_dict.keys())),reverse=True)]#sorting phonemes dictionary based on the corresponding entropy
+    g = sns.barplot(phn_dict_sorted_based_on_entropy, sorted(entropy_lst,reverse=True))
     g.set_xticklabels(g.get_xticklabels(), rotation=-90)
     plt.xlabel('phonemes')
     plt.ylabel('entropy')
+    plt.title('Entropy of each TIMIT dataset phoneme according to codebook entries of xlsr-53 model')
+    plt.savefig("Entropy.pdf", bbox_inches="tight")
     plt.show()
-    # ax.set_title('Entropy vs phonemes')
+if __name__ == "__main__":
+   main()
 #entropy for 55 elements- 4.007333185232471
 #entropy for 100 elements - 4.605170185988092
