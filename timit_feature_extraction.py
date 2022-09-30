@@ -7,14 +7,19 @@ import os
 from collections import Counter
 import pickle
 
-feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/wav2vec2-large-xlsr-53")
-model = Wav2Vec2ForPreTraining.from_pretrained("facebook/wav2vec2-large-xlsr-53")
-def xlsr_codes(audio_path):
+
+
+def xlsr_codes(audio_path,codebook,pickle_path,feature_extractor,model):
     wav,sample = torchaudio.load(audio_path)
     input_values = feature_extractor(wav.squeeze(), return_tensors="pt",sampling_rate = 16000).input_values
     with torch.no_grad():
         codevector_probs,codevectors,codevector_idx = model(input_values)
-    output = codevector_idx.view(-1,2)[:,0].tolist()
+    output = codevector_idx.view(-1,2)[:,codebook-1].tolist()
+    file_pt = audio_path.split('/')[-4:-1]
+    if not os.path.exists(pickle_path+'/'.join(file_pt)):
+        os.makedirs(pickle_path+'/'.join(file_pt))
+    with open(pickle_path+'/'.join(file_pt)+'/'+audio_path.split('/')[-1].split('.')[0]+'.pkl', 'wb') as f:
+        pickle.dump(output, f)
     return output
 def codes_low_high(audio_path,xlsr_codes):
     y, sr = librosa.load(audio_path)
@@ -68,20 +73,35 @@ def phn_ind(phn_path,low_lst,high_lst,xlsr_codes,phn_dict ={}):
         print(f'{lines[val]}-{lines_1[val]}_{p}:{xlsr_codes[low_lst.index(l):high_lst.index(h)+1]}')
 
     return phn_dict
-
-rootdir = '/Users/mohammedmaqsoodshaik/Desktop/hiwi/task1/TIMIT/timit/'
-phn_dict ={}
-for subdir, dirs, files in os.walk(rootdir):
-    for file in files:
-        if 'wav'in os.path.join(subdir, file):
-            print(os.path.join(subdir, file))
-            audio_path = os.path.join(subdir, file)
-            phnpath = audio_path.replace('wav','phn')
-            print(phnpath)
-            output = xlsr_codes(audio_path)
-            low_lst,high_lst = codes_low_high(audio_path,output)
-            phn_dict = phn_ind(phnpath,low_lst,high_lst,output,phn_dict)
-with open('saved_dictionary_codebook_1.pkl', 'wb') as f:
-    pickle.dump(phn_dict, f)
-for dict_val in phn_dict.keys():
-    print(f'{dict_val}-{dict(Counter(phn_dict[dict_val]))}')
+def main():
+    # feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/wav2vec2-large-xlsr-53")
+    # model = Wav2Vec2ForPreTraining.from_pretrained("facebook/wav2vec2-large-xlsr-53")
+    feature_extractor = AutoFeatureExtractor.from_pretrained("facebook/wav2vec2-base")
+    model = Wav2Vec2ForPreTraining.from_pretrained("facebook/wav2vec2-base")
+    codebook = 2
+    rootdir = '/Users/mohammedmaqsoodshaik/Desktop/hiwi/task1/TIMIT/timit/'
+    pickle_path = f'/Users/mohammedmaqsoodshaik/Desktop/hiwi/task1/timit_pkl_only_english/codebook{codebook}/'
+    phn_dict ={}
+    extract = 1
+    phn_to_codebook_entry = 0
+    for subdir, dirs, files in os.walk(rootdir):
+        for file in files:
+            if 'wav'in os.path.join(subdir, file):
+                print(os.path.join(subdir, file))
+                audio_path = os.path.join(subdir, file)
+                phnpath = audio_path.replace('wav','phn')
+                print(phnpath)
+                if extract ==1:
+                    output = xlsr_codes(audio_path,codebook,pickle_path,feature_extractor,model)
+                else:
+                    pass
+                if phn_to_codebook_entry:
+                    low_lst,high_lst = codes_low_high(audio_path,output)
+                    phn_dict = phn_ind(phnpath,low_lst,high_lst,output,phn_dict)
+    if phn_to_codebook_entry:
+        with open('saved_dictionary_codebook_1.pkl', 'wb') as f:
+            pickle.dump(phn_dict, f)
+        for dict_val in phn_dict.keys():
+            print(f'{dict_val}-{dict(Counter(phn_dict[dict_val]))}')
+if __name__ == "__main__":
+   main()
