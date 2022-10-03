@@ -6,10 +6,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-
+import timit_to_ipa
 def main():
     codebook = 1
-    folder_name = "timit_pkl_only_english"
+    folder_name = "timit_pkl"
     pickle_path = (
         f"/Users/mohammedmaqsoodshaik/Desktop/hiwi/task1/{folder_name}/codebook{codebook}/"
     )
@@ -28,7 +28,8 @@ def main():
     sim_mt = np.array(sim_mt)
     sim_mt_diag = sim_mt.diagonal()
     sim_mt_diag = 1.0 - sim_mt_diag
-    sorted_phn_sim = [x for _, x in sorted(zip(sim_mt_diag, list(phn_dict_m.keys())))]
+    labels = [timit_to_ipa.timit_2_ipa[k] for k in phn_dict_m.keys()]
+    sorted_phn_sim = [x for _, x in sorted(zip(sim_mt_diag, labels))]
     g = sns.barplot(sorted_phn_sim, sorted(sim_mt_diag))
     g.set_xticklabels(g.get_xticklabels(), rotation=-90)
     plt.xlabel("phonemes")
