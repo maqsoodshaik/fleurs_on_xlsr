@@ -1,4 +1,4 @@
-from entropy_of_phonemes import *
+# from entropy_of_phonemes import *
 import numpy as np
 from scipy.spatial import distance
 from matplotlib import cm as cm
@@ -11,9 +11,29 @@ import random
 from timit_feature_extraction import codes_low_high,phn_ind
 import os
 import timit_to_ipa
+from collections import Counter
+import matplotlib.pyplot as plt
+import pickle
+import seaborn as sns
 # from  male_female_timit_analysis import phn_dict_generator
+def flatten(l): #flattening list of lists
+    return [item for sublist in l for item in sublist]
 
+def adding_missing_phn_count(set_of_val,phn_dict,phn_name):
+    phn_map_counts = dict(Counter(phn_dict[phn_name]))
+    ##sorting counter dictionary
+    # sorted_tuples = sorted(dict1.items(), key=operator.itemgetter(1))
+    # # print(sorted_tuples)  # [(1, 1), (3, 4), (2, 9)]
 
+    # sorted_dict = OrderedDict()
+    # for k, v in sorted_tuples:
+
+    #     sorted_dict[k] = v
+    temp_lst = []
+    #creating list of counts of code entries even including the codeentries which are not present
+    temp_lst = [phn_map_counts[val] if val in phn_map_counts else 0 for val in set_of_val]
+    temp_lst = [float(i)/sum(temp_lst) for i in temp_lst]
+    return temp_lst
 
 def absolute_discounting(dist: list,abs_discount,set_of_val):
     dist = np.array(dist)
