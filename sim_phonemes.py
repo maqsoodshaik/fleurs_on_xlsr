@@ -76,19 +76,19 @@ def similarity_calculation(phn_to_dist_1, phn_to_dist_2,abs_discount):
             sim_mt[num1][num2] = distance.jensenshannon(
                 phn_to_dist_1[i], phn_to_dist_2[j]
             )
-            print(f"sim between {i} and {j}:", sim_mt[num1][num2])
+            # print(f"sim between {i} and {j}:", sim_mt[num1][num2])
     return sim_mt,sim_keys_sorted
 
 
 # plotting similarity
 def plot_sim(sim_mt, phn_to_dist_1_keys, phn_to_dist_2_keys):
     cmap = cm.get_cmap("YlGnBu")
-    fig, ax = plt.subplots(figsize=(7, 7))
+    fig, ax = plt.subplots(figsize=(7,7))
     cax = ax.matshow(1.0 - sim_mt, interpolation="nearest", cmap=cmap)
     # ax.grid(True)
     plt.title("Similarity matrix")
     plt.xticks(range(sim_mt.shape[0]), phn_to_dist_1_keys, rotation=90,fontsize = 10)
-    plt.yticks(range(sim_mt.shape[1]), phn_to_dist_1_keys,fontsize =10)
+    plt.yticks(range(sim_mt.shape[1]), phn_to_dist_2_keys,fontsize =10)
     fig.colorbar(cax, ticks=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
     plt.savefig("sim_phn.pdf", bbox_inches="tight")
     plt.figure()
@@ -115,7 +115,7 @@ def mds_plot(sim_mt, phn_to_dist_1_keys):
 def phn_dict_generator(phn_dict,pickle_path,rootdir, starts_with = ""):
         for subdir, dirs, files in os.walk(pickle_path):
             for file in files:
-                if subdir.split("/")[-1].startswith(starts_with) and "pkl" in file:
+                if subdir.split("/")[-1].startswith(starts_with) and "pkl" in file and "_phn" not in file:
                     with open(os.path.join(subdir, file), "rb") as f:
                         output = pickle.load(f)
                     low_lst, high_lst = codes_low_high(
@@ -130,6 +130,9 @@ def phn_dict_generator(phn_dict,pickle_path,rootdir, starts_with = ""):
                         file.replace("pkl", "phn"),
                     )
                     phn_dict = phn_ind(phnpath, low_lst, high_lst, output, phn_dict)
+                    if not os.path.exists(subdir+'/'+file.split(".")[0]+'_phn.pkl'):
+                        with open(subdir+'/'+file.split(".")[0]+'_phn.pkl', 'wb') as f:
+                            pickle.dump(phn_ind(phnpath, low_lst, high_lst, output, {}), f)
         return phn_dict
 
 def main():
