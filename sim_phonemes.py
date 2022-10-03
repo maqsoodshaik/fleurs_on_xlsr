@@ -69,13 +69,15 @@ def similarity_calculation(phn_to_dist_1, phn_to_dist_2,abs_discount):
     phn_to_dist_1 = smoothing_dist(phn_to_dist_1, set_of_val,abs_discount)
     phn_to_dist_2 = smoothing_dist(phn_to_dist_2, set_of_val,abs_discount)
     sim_mt = np.zeros((len(phn_to_dist_1), len(phn_to_dist_2)))
-    for num1, i in enumerate(phn_to_dist_1.keys()):
-        for num2, j in enumerate(phn_to_dist_2.keys()):
+    sim_keys_sorted = ["ih","iy","eh","aa","er","ah","ao","uh","uw","ow","ay","aw","ey","w","l","el","r","y","m","n","ng","nx","en","b","d","dh","dx","g","v","th","z","f","s","sh","hh","jh","ch"]
+    sim_keys_sorted=sim_keys_sorted+list(phn_to_dist_1.keys()-sim_keys_sorted)
+    for num1, i in enumerate(sim_keys_sorted):
+        for num2, j in enumerate(sim_keys_sorted):
             sim_mt[num1][num2] = distance.jensenshannon(
                 phn_to_dist_1[i], phn_to_dist_2[j]
             )
             print(f"sim between {i} and {j}:", sim_mt[num1][num2])
-    return sim_mt
+    return sim_mt,sim_keys_sorted
 
 
 # plotting similarity
@@ -135,7 +137,7 @@ def main():
     #     phn_dict_o = pickle.load(f)
     phn_dict ={}
     codebook = 2
-    folder_name = "timit_pkl"
+    folder_name = "timit_pkl_wav2vec2"
     pickle_path = (
         f"/Users/mohammedmaqsoodshaik/Desktop/hiwi/task1/{folder_name}/codebook{codebook}/"
     )
@@ -144,11 +146,11 @@ def main():
     # set_of_val = set(list(flatten(phn_dict.values())))
     # print(f'set:{len(set_of_val)}')
     abs_discount = 0.00000000002
-    sim_mt = similarity_calculation(phn_dict, phn_dict,abs_discount)
-    labels = [timit_to_ipa.timit_2_ipa[k] for k in phn_dict.keys()]
+    sim_mt,sorted_phonemes = similarity_calculation(phn_dict, phn_dict,abs_discount)
+    labels = [timit_to_ipa.timit_2_ipa[k] for k in sorted_phonemes]
     plot_sim(sim_mt, labels, labels)
-    # plt.figure()
-    # mds_plot(sim_mt, labels)
+    plt.figure()
+    mds_plot(sim_mt, labels)
     plt.show()
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ def main():
     starts_with = "f"
     phn_dict_f = phn_dict_generator(phn_dict_f,pickle_path,rootdir, starts_with)
     abs_discount = 0.00000000002
-    sim_mt = similarity_calculation(phn_dict_m, phn_dict_f,abs_discount)
+    sim_mt,_ = similarity_calculation(phn_dict_m, phn_dict_f,abs_discount)
     sim_mt = np.array(sim_mt)
     sim_mt_diag = sim_mt.diagonal()
     sim_mt_diag = 1.0 - sim_mt_diag
