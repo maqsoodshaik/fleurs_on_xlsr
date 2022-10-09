@@ -15,7 +15,7 @@ def main():
     #load from multiple file
     phn_dict1 ={}
     codebook = 1
-    folder_name = "timit_pkl_only_english"
+    folder_name = "timit_pkl_wav2vec2"
     model = "wav2vec2.0"#"xlsr-53"
     pickle_path = (
         f"/Users/mohammedmaqsoodshaik/Desktop/hiwi/task1/{folder_name}/codebook{codebook}/"
@@ -24,7 +24,7 @@ def main():
     phn_dict1 = phn_dict_generator(phn_dict1,pickle_path,rootdir)
     phn_dict2 ={}
     codebook = 2
-    folder_name = "timit_pkl_only_english"
+    folder_name = "timit_pkl_wav2vec2"
     pickle_path = (
         f"/Users/mohammedmaqsoodshaik/Desktop/hiwi/task1/{folder_name}/codebook{codebook}/"
     )
@@ -57,11 +57,11 @@ def main():
         # print(f"{dict_val}-{dict(sorted_dict).popitem()[0]}")
     #plotting the entropy
     labels = [timit_to_ipa.timit_2_ipa[k] for k in phn_dict.keys()]
-    phn_dict_sorted_based_on_entropy = [x for _,x in sorted(zip(entropy_lst,labels),reverse=True)]#sorting phonemes dictionary based on the corresponding entropy
-    g = sns.barplot(phn_dict_sorted_based_on_entropy, sorted(entropy_lst,reverse=True))
+    phn_dict_sorted_based_on_entropy = [x for _,x in sorted(zip(entropy_lst,labels))]#sorting phonemes dictionary based on the corresponding entropy
+    g = sns.barplot(sorted(entropy_lst),phn_dict_sorted_based_on_entropy)
     g.set_xticklabels(g.get_xticklabels(), rotation=-90)
-    plt.xlabel('phonemes',fontsize = 0.1)
-    plt.ylabel('entropy')
+    plt.ylabel('phonemes',fontsize = 0.1)
+    plt.xlabel('entropy')
     plt.title(f'Entropy of each TIMIT dataset phoneme according to codebook entries of {model} model')
     # plt.savefig("Entropy_2.pdf", bbox_inches="tight")
     plt.show()
