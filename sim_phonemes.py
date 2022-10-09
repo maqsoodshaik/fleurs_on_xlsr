@@ -126,6 +126,8 @@ def similarity_calculation(phn_to_dist_1, phn_to_dist_2, abs_discount):
         "k"
     ]
     sim_keys_sorted = sim_keys_sorted + sorted(list(phn_to_dist_1.keys() - sim_keys_sorted))
+    sim_keys_sorted = ["iy","ah","uh"]#["iy","ih","eh","ae","ax","ah","uh","uw","ao"]
+    sim_mt = np.zeros((len(sim_keys_sorted), len(sim_keys_sorted)))
     for num1, i in enumerate(sim_keys_sorted):
         for num2, j in enumerate(sim_keys_sorted):
             sim_mt[num1][num2] = distance.jensenshannon(
