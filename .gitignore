@@ -1,1 +1,11 @@
 TIMIT
+*.pt
+*.pdf
+*.json
+.DS_Store
+timit_pkl
+timit_pkl_only_english
+*.png
+*.pptx
+*.pkl
+*.pyc
