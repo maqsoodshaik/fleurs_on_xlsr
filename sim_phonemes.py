@@ -136,7 +136,7 @@ def similarity_calculation(phn_to_dist_1, phn_to_dist_2, abs_discount):
 
 
 # plotting similarity
-def plot_sim(sim_mt, phn_to_dist_1_keys, phn_to_dist_2_keys):
+def plot_sim(sim_mt, phn_to_dist_1_keys, phn_to_dist_2_keys,dend = False):
     cmap = cm.get_cmap("YlGnBu")
     fig, ax = plt.subplots(figsize=(7, 7))
     cax = ax.matshow(1.0 - sim_mt, interpolation="nearest", cmap=cmap)
@@ -146,21 +146,22 @@ def plot_sim(sim_mt, phn_to_dist_1_keys, phn_to_dist_2_keys):
     plt.yticks(range(sim_mt.shape[1]), phn_to_dist_2_keys, fontsize=5)
     fig.colorbar(cax, ticks=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
     plt.savefig("sim_phn.pdf", bbox_inches="tight")
-    plt.figure()
-    selected_data = sim_mt
-    clusters = shc.linkage(
-        squareform(selected_data),
-        method="ward",
-        metric="euclidean",
-        optimal_ordering=True,
-    )
-    shc.dendrogram(
-        Z=clusters,
-        labels=list(phn_to_dist_1_keys),
-        orientation="left",
-        distance_sort=True,
-    )
-    plt.savefig("dend_phn.pdf", bbox_inches="tight")
+    if dend == True:
+        plt.figure()
+        selected_data = sim_mt
+        clusters = shc.linkage(
+            squareform(selected_data),
+            method="ward",
+            metric="euclidean",
+            optimal_ordering=True,
+        )
+        shc.dendrogram(
+            Z=clusters,
+            labels=list(phn_to_dist_1_keys),
+            orientation="left",
+            distance_sort=True,
+        )
+        plt.savefig("dend_phn.pdf", bbox_inches="tight")
 
 
 # MDS plot
